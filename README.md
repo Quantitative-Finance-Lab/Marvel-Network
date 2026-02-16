@@ -1,11 +1,28 @@
 # Marvel-Network
 
+## Overview
+
+This repository provides replication code for the network visualization of Marvel Cinematic Universe (MCU) films reported in **Figure 1** of the accompanying manuscript. The paper examines whether films’ commercial performance within the MCU is associated with **narrative interconnectedness** in a shared cinematic universe.
+
+The repository includes input data in Excel format:
+- *mcu_global.xlsx*: Dataset containing information on the Marvel Cinematic Universe (MCU).
+
+
 <p align="center">
-  <img src = "README_image/network_image.png" width = "30%"> <br>
-  Figure 1. Network map of MCU films.
+  <img src="README_image/network_image.png" width="100%"><br>
+  <em>Figure 1. Network map of MCU films.</em>
 </p>
 
-We examine whether the commercial success of films in the Marvel Cinematic Universe (MCU) is driven by narrative interconnectedness within a shared cinematic universe. 
+**Figure 1** presents a film-level network of the MCU. Nodes represent individual MCU films. Edges encode pairwise narrative linkages based on character overlap, operationalized using the **Jaccard similarity** between the sets of heroes appearing in two films:
+```math
+\mathrm{Similarity}(A,B)=\frac{n(A\cap B)}{n(A\cup B)},
+```
+where $A$ and $B$ denote the sets of heroes appearing in each films.
+
+The visualization provides an interpretable representation of the franchise’s relational structure and serves as descriptive evidence for our empirical analysis of interconnectedness and films’ commercial success.
+
+The code in this repository reproduces Figure 1 (subject to platform-specific rendering differences). Running the provided scripts will (i) construct the MCU film network from the underlying inputs and (ii) generate the corresponding node–edge visualization.
+
 
 ```python
 import pandas as pd
