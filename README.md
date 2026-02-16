@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository provides replication code for the network visualization of Marvel Cinematic Universe (MCU) films reported in **Figure 1** of the accompanying manuscript. The paper examines whether films’ commercial performance within the MCU is associated with narrative interconnectedness in a shared cinematic universe.
+This repository provides replication code for the network visualization of Marvel Cinematic Universe (MCU) films reported in Figure 1 of the accompanying manuscript. The paper examines whether films’ commercial performance within the MCU is associated with narrative interconnectedness in a shared cinematic universe.
 
 The repository includes input data in Excel format:
 - *mcu_global.xlsx*: Dataset containing information on the Marvel Cinematic Universe (MCU).
@@ -10,10 +10,10 @@ The repository includes input data in Excel format:
 
 <p align="center">
   <img src="README_image/network_image.png" width="100%"><br>
-  <em>Figure 1. Network map of MCU films.</em>
+  Figure 1. Network map of MCU films.
 </p>
 
-**Figure 1** presents a film-level network of the MCU. Nodes represent individual MCU films. Edges encode pairwise narrative linkages based on character overlap, operationalized using the Jaccard similarity between the sets of heroes appearing in two films:
+Figure 1 presents a film-level network of the MCU. Nodes represent individual MCU films. Edges encode pairwise narrative linkages based on character overlap, operationalized using the Jaccard similarity between the sets of heroes appearing in two films:
 ```math
 \mathrm{Similarity}(A,B)=\frac{n(A\cap B)}{n(A\cup B)},
 ```
