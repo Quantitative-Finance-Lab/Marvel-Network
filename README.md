@@ -13,7 +13,7 @@ The repository includes input data in Excel format:
   <em>Figure 1. Network map of MCU films.</em>
 </p>
 
-**Figure 1** presents a film-level network of the MCU. Nodes represent individual MCU films. Edges encode pairwise narrative linkages based on character overlap, operationalized using the **Jaccard similarity** between the sets of heroes appearing in two films:
+**Figure 1** presents a film-level network of the MCU. Nodes represent individual MCU films. Edges encode pairwise narrative linkages based on character overlap, operationalized using the Jaccard similarity between the sets of heroes appearing in two films:
 ```math
 \mathrm{Similarity}(A,B)=\frac{n(A\cap B)}{n(A\cup B)},
 ```
