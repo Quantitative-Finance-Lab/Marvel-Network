@@ -1,5 +1,10 @@
 # Marvel-Network
 
+<p align="center">
+  <img src = "README_image/network_image.png" width = "30%"> <br>
+  Figure 1. Network map of MCU films.
+</p>
+
 We examine whether the commercial success of films in the Marvel Cinematic Universe (MCU) is driven by narrative interconnectedness within a shared cinematic universe. 
 
 ```python
