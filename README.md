@@ -21,6 +21,9 @@ where $A$ and $B$ denote the sets of heroes appearing in each films.
 
 The visualization provides an interpretable representation of the franchise’s relational structure and serves as descriptive evidence for our empirical analysis of interconnectedness and films’ commercial success.
 
+
+
+## Replication
 The code in this repository reproduces Figure 1 (subject to platform-specific rendering differences). Running the provided scripts will (i) construct the MCU film network from the underlying inputs and (ii) generate the corresponding node–edge visualization.
 
 
