@@ -24,51 +24,61 @@ The visualization provides an interpretable representation of the franchise’s 
 
 
 ## Replication
-The code in this repository reproduces Figure 1 (subject to platform-specific rendering differences). Running the provided scripts will (i) construct the MCU film network from the underlying inputs and (ii) generate the corresponding node–edge visualization.
+The code in this repository reproduces Figure 1 (subject to platform-specific rendering differences). Running the provided scripts will (i) construct the MCU film network from the underlying inputs and (ii) generate the corresponding node–edge visualization. The resulting network is saved as a GraphML file and can be loaded into Gephi for further inspection and visualization.
 
 
 ```python
 import pandas as pd
-import networkx as nx
-import matplotlib.pyplot as plt
-
+# Load the MCU dataset from an Excel file
 df = pd.read_excel('mcu_global.xlsx')
-df1 = df.iloc[:,[1,5,6,7,8,27,-2,-1]]
-df1.columns = ['tt','dir','sw','pd','cst','adjusted_roi','dom_roi','inter_roi']
 
-df1['dir'] = df1['dir'].apply(lambda x: [i.strip() for i in x.split(', ')])
-df1['sw'] = df1['sw'].apply(lambda x: [i.strip() for i in x.split(', ')])
-df1['pd'] = df1['pd'].apply(lambda x: [i.strip() for i in x.split(', ')])
-df1['cst'] = df1['cst'].apply(lambda x: [i.strip() for i in x.split(', ')])
+# Data Preprocessing: Extract only necessary columns (Title, Phase, Cast)
+df1 = df.iloc[:,[1,2,8]]
+# Split the 'Cast' string into a list, removing extra whitespace
+df1['Cast'] = df1['Cast'].str.split(r',\s*')
+# Remove rows with missing values
+df1 = df1.dropna()
 
+# Function to calculate Jaccard Similarity (Intersection over Union) of casts
 def weight_counter(a,b):
     set1 = set(a)
     set2 = set(b)
     intersection = set1.intersection(set2)
     union = set1.union(set2)
+    # Return similarity score; return 0 if there is no union to avoid division by zero
     return len(intersection) / len(union) if union else 0
 
+# Initialize a weight matrix with movie titles as indices and columns
 n = len(df1)
-weight_matrix = pd.DataFrame(index = df1['tt'] , columns = df1['tt'], dtype = 'float')
+weight_matrix = pd.DataFrame(index = df1['Title'] , columns = df1['Title'], dtype = 'float')
 
+# Fill the matrix with weight values to check the influence/overlap between movies
 for i in range(n):
     for j in range(n):
-        weight_matrix.iloc[i, j] = weight_counter(df1.iloc[i]['cst'], df1.iloc[j]['cst'])
+        weight_matrix.iloc[i, j] = weight_counter(df1.iloc[i]['Cast'], df1.iloc[j]['Cast'])
 
+
+# Network Construction
+# Assign groups based on Marvel Phase (Phase 1-3 as group1, others as group2)
+phase_map = {
+    row['Title']: ('group1' if row['Phase'] <= 3 else 'group2') 
+    for _, row in df1.iterrows()
+}
+
+# Network Analysis using NetworkX
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# Initialize an undirected graph
 G = nx.Graph()
 
-# Add a node including the inter_roi attribute
+# Add nodes: Use movie titles from the weight matrix index
 for movie in weight_matrix.index:
-    roi = df1.loc[df1['tt'] == movie, 'adjusted_roi'].values
-    if len(roi) > 0:
-        G.add_node(movie, adjusted_roi=roi[0])
-    else:
-        G.add_node(movie)
+    G.add_node(movie)
 
-
-# Add an edge if similarity > 0
+# Add edges: Connect movies only if the similarity weight is greater than 0
 for i in range(n):
-    for j in range(i+1, n):  # 대각선 아래는 생략
+    for j in range(i+1, n):  # Skip the diagonal and lower triangle to avoid duplicates
         weight = weight_matrix.iloc[i, j]
         
         if weight > 0:
@@ -76,62 +86,11 @@ for i in range(n):
             movie2 = weight_matrix.columns[j]
             G.add_edge(movie1, movie2, weight=weight)
 
-labels = {
-    'Iron Man': 'Iron Man',
-    'Iron Man 2': 'Iron Man',
-    'Iron Man 3': 'Iron Man',
-
-    'The Incredible Hulk': 'The Incredible Hulk',
-
-    'Thor': 'Thor',
-    'Thor: The Dark World': 'Thor',
-    'Thor: Ragnarok': 'Thor',
-    'Thor: Love and Thunder': 'Thor',
-
-    'Captain America: The First Avenger': 'Captain America',
-    'Captain America: The Winter Soldier': 'Captain America',
-    'Captain America: Civil War': 'Captain America',
-    'Captain America: Brave New World': 'Captain America',
-
-    'The Avengers': 'Avengers',
-    'Avengers: Age of Ultron': 'Avengers',
-    'Avengers: Infinity War': 'Avengers',
-    'Avengers: Endgame': 'Avengers',
-
-    'Guardians of the Galaxy': 'Guardians of the Galaxy',
-    'Guardians of the Galaxy Vol. 2': 'Guardians of the Galaxy',
-    'Guardians of the Galaxy Vol. 3': 'Guardians of the Galaxy',
-
-    'Ant-Man': 'Ant-Man',
-    'Ant-Man and the Wasp': 'Ant-Man',
-    'Ant-Man and the Wasp: Quantumania': 'Ant-Man',
-
-    'Spider-Man: Homecoming': 'Spider-Man',
-    'Spider-Man: Far from Home': 'Spider-Man',
-    'Spider-Man: No Way Home': 'Spider-Man',
-
-    'Doctor Strange': 'Doctor Strange',
-    'Doctor Strange in the Multiverse of Madness': 'Doctor Strange',
-
-    'Black Panther': 'Black Panther',
-    'Black Panther II': 'Black Panther',
-
-    'Captain Marvel': 'Captain Marvel',
-    'The Marvels': 'Captain Marvel',
-
-    'Black Widow': 'Black Widow',
-
-    'Shang-Chi and the Legend of the Ten Rings': 'Shang-Chi',
-    'Eternals': 'Eternals',
-
-    'Deadpool & Wolverine': 'Deadpool',
-    'Thunderbolts*': 'Thunderbolts'
-}
-
-# Assign grouped labels to nodes
+# Assign metadata (Phase group) to each node in the graph            
 for node in G.nodes():
-    G.nodes[node]['group'] = labels.get(node, 'Other')
+    G.nodes[node]['group'] = phase_map.get(node, 'Other')
 
-nx.write_graphml(G, 'marvle_nw.graphml')
+# Export the graph to a .graphml file for visualization in Gephi
+nx.write_graphml(G, 'marvel.graphml')
 
 ```
